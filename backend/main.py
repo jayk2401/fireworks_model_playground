@@ -35,12 +35,22 @@ def chat_request(chatRequest: ChatRequest):
         deployment_type="serverless"
     )
 
-    response = llm.chat.completions.create(
-        messages=[{
-            "role": "system",
-            "content": chatRequest.prompt,
-        }],
-    )
+    # response = llm.chat.completions.create(
+    #     messages=[{
+    #         "role": "system",
+    #         "content": chatRequest.prompt,
+    #     }],
+    # )
 
-    formmated_response = response.choices[0].message.content.split("</think>")[1].strip()
-    return {"response": formmated_response}
+    # formmated_response = response.choices[0].message.content.split("</think>")[1].strip()
+
+
+    response = llm.responses.create(
+        input=chatRequest.prompt,
+        # tools=[{"type": "sse", "server_url": "https://gitmcp.io/docs"}]
+    )
+    
+    initial_response_id = response.id
+    formmated_response = response.output[-1].content[0].text.split("</think>")[-1]
+
+    return {"response": formmated_response, "response_id": initial_response_id}
