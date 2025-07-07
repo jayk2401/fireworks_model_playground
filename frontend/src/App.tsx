@@ -1,12 +1,32 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, useEffect } from 'react'
+// import reactLogo from './assets/react.svg'
+// import viteLogo from '/vite.svg'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
+import axios from 'axios'
 
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  type Model = {
+    name: string;
+    title: string;
+    // add more fields as needed
+  };
+
+  // const [count, setCount] = useState(0)
+  const [models, setModels] = useState<Model[]>([]);
+  const [selectedModel, setSelectedModel] = useState<string | null>(null)
+
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    axios.get('https://app.fireworks.ai/api/models/mini-playground')
+      .then((res) => setModels(res.data))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false))
+  }, [])
 
   return (
     <>
@@ -38,14 +58,19 @@ function App() {
           </label>
           <div className="mt-2 grid grid-cols-1">
             <select
-              id="location"
-              name="location"
-              defaultValue="Canada"
+              id="model"
+              name="model"
+              // defaultValue="Canada"
+              value={selectedModel ?? ''}
+              onChange={(e) => setSelectedModel(String(e.target.value))}
               className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
             >
-              <option>United States</option>
-              <option>Canada</option>
-              <option>Mexico</option>
+
+              {models.map(model => (
+                <option key={model.name} value={model.name}>
+                  {model.title}
+                </option>
+              ))}
             </select>
             <ChevronDownIcon
               aria-hidden="true"
