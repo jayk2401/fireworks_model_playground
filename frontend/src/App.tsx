@@ -16,7 +16,7 @@ function App() {
 
   // const [count, setCount] = useState(0)
   const [models, setModels] = useState<Model[]>([]);
-  const [selectedModel, setSelectedModel] = useState<string | null>(null)
+  const [selectedModel, setSelectedModel] = useState<string | null>('qwen3-30b-a3b')
   const [prompt, setPrompt] = useState<string>('')
 
   const [loading, setLoading] = useState(true)
@@ -32,11 +32,15 @@ function App() {
   const promptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setPrompt(e.target.value)
   }
-  const submitChat = () => {
-    console.log('Button was clicked')
-    console.log(selectedModel)
-    console.log(prompt)
-  }
+
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post("http://localhost:8000/chat_request", { model: selectedModel, prompt: prompt });
+      console.log("Response:", response.data);
+    } catch (error) {
+      console.error("Error posting item:", error);
+    }
+  };
 
   const modelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const fullModelPath = e.target.value
@@ -116,7 +120,7 @@ function App() {
 
         <button
           type="button"
-          onClick={submitChat}
+          onClick={handleSubmit}
           className="rounded-full bg-white px-2.5 py-1 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
         >
           Let's go!
