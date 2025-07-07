@@ -17,6 +17,7 @@ function App() {
   // const [count, setCount] = useState(0)
   const [models, setModels] = useState<Model[]>([]);
   const [selectedModel, setSelectedModel] = useState<string | null>(null)
+  const [prompt, setPrompt] = useState<string>('')
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -27,6 +28,21 @@ function App() {
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
   }, [])
+
+  const promptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setPrompt(e.target.value)
+  }
+  const submitChat = () => {
+    console.log('Button was clicked')
+    console.log(selectedModel)
+    console.log(prompt)
+  }
+
+  const modelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const fullModelPath = e.target.value
+    const modelName = fullModelPath.split('/').pop()
+    setSelectedModel(modelName ?? null)
+  }
 
   return (
     <>
@@ -62,7 +78,8 @@ function App() {
               name="model"
               // defaultValue="Canada"
               value={selectedModel ?? ''}
-              onChange={(e) => setSelectedModel(String(e.target.value))}
+              // onChange={(e) => setSelectedModel(String(e.target.value))}
+              onChange={modelChange}
               className="col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-1.5 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
             >
 
@@ -91,6 +108,7 @@ function App() {
               rows={4}
               className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
               defaultValue={''}
+              onChange={promptChange}
             />
           </div>
         </div>
@@ -98,6 +116,7 @@ function App() {
 
         <button
           type="button"
+          onClick={submitChat}
           className="rounded-full bg-white px-2.5 py-1 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
         >
           Let's go!
