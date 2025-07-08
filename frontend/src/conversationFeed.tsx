@@ -54,7 +54,7 @@ export default function ConversationFeed({ messages }: Messages) {
     return (
 
         <div className="flow-root">
-            <ul ref={ulRef} role="list" className="-mb-8 border-1 border-purple-700 rounded-lg p-4 h-[85vh] overflow-y-auto">
+            <ul ref={ulRef} role="list" className="-mb-8 border-1 border-purple-700 rounded-lg p-4 h-[80vh] overflow-y-auto">
                 {messages.map((messageItem) => (
                     <li key={messageItem.message}>
                         {/* <div className="relative p-4 border-b-1 border-purple-500 bg-gray-100"> */}

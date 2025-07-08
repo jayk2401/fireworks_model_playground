@@ -108,15 +108,15 @@ function App() {
 
   return (
     <>
-      {/* <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
+      <div className="flex justify-center m-6">
+        <a href="https://fireworks.ai/" target="_blank">
+          <img src={'https://cdn.sanity.io/images/pv37i0yn/production/df64b2d19687cef1b12f8c0bca7d979faf9fe7c0-215x24.svg'} className="logo" alt="Fireworks logo" />
         </a>
-        <a href="https://react.dev" target="_blank">
+        {/* <a href="https://react.dev" target="_blank">
           <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        </a> */}
       </div>
-      <h1>Vite + React</h1>
+      {/* <h1>Vite + React</h1>
       <div className="card">
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
