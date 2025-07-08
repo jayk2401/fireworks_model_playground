@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from pydantic import BaseModel
 from fireworks import LLM
+from typing import Optional
 
 app = FastAPI()
 
@@ -21,6 +22,7 @@ app.add_middleware(
 class ChatRequest(BaseModel):
     model: str
     prompt: str
+    response_id: Optional[str] = None
 
 
 @app.get("/")
@@ -57,3 +59,28 @@ def chat_request(chatRequest: ChatRequest):
     formmated_response = formmated_response.replace("\n\n", "\n")
 
     return {"response": formmated_response, "response_id": initial_response_id}
+
+
+@app.post("/chat_request_continued")
+def chat_request_continued(chatRequest: ChatRequest):
+    print("chat_request_continued")
+    print(chatRequest.prompt)
+    print(chatRequest.response_id)
+    llm = LLM(
+        model=chatRequest.model,
+        deployment_type="serverless"
+    )
+
+    response = llm.responses.create(
+        input=chatRequest.prompt,
+        previous_response_id=chatRequest.response_id,
+        # tools=[{"type": "sse", "server_url": "https://gitmcp.io/docs"}]
+    )
+    
+    # initial_response_id = response.id
+    formmated_response = response.output[-1].content[0].text.split("</think>")[-1]
+    
+    # Remove extra newline
+    formmated_response = formmated_response.replace("\n\n", "\n")
+
+    return {"response": formmated_response}

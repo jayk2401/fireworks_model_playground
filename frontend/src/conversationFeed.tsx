@@ -40,8 +40,9 @@ type Messages = {
 export default function ConversationFeed({ messages }: Messages) {
     console.log(messages)
     return (
+
         <div className="flow-root">
-            <ul role="list" className="-mb-8 border-1 border-purple-700 rounded-lg p-4">
+            <ul role="list" className="-mb-8 border-1 border-purple-700 rounded-lg p-4 h-[85vh] overflow-y-auto">
                 {messages.map((messageItem) => (
                     <li key={messageItem.message}>
                         {/* <div className="relative p-4 border-b-1 border-purple-500 bg-gray-100"> */}
@@ -80,5 +81,7 @@ export default function ConversationFeed({ messages }: Messages) {
                 ))}
             </ul>
         </div>
+
+
     )
 }

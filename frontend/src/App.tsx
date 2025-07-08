@@ -22,6 +22,7 @@ function App() {
   const [models, setModels] = useState<Model[]>([]);
   const [selectedModel, setSelectedModel] = useState<string | null>('qwen3-30b-a3b')
   const [prompt, setPrompt] = useState<string>('')
+  const [continuedPrompt, setContinuedPrompt] = useState<string>('')
 
   const [messages, setMessages] = useState<{ role: string; message: string }[]>([])
 
@@ -41,12 +42,15 @@ function App() {
     setPrompt(e.target.value)
   }
 
-  const handleSubmit = async () => {
+  const continuedPromptChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContinuedPrompt(e.target.value)
+  }
+
+  const handleInitialChatSubmit = async () => {
     setLoading(true)
     try {
       const response = await axios.post("http://localhost:8000/chat_request", { model: selectedModel, prompt: prompt });
       console.log("Response:", response.data);
-
 
       const userMessage: Message = {
         role: "User",
@@ -59,10 +63,31 @@ function App() {
       }
 
       setMessages((prevMessages) => [...prevMessages, userMessage, systemMessage]);
-
-
-
       setResponseId(response.data.response_id)
+      setLoading(false)
+    } catch (error) {
+      console.error("Error posting item:", error);
+    }
+  };
+
+  const handleContinuedChatSubmit = async () => {
+    setLoading(true)
+    try {
+      const response = await axios.post("http://localhost:8000/chat_request_continued", { model: selectedModel, prompt: continuedPrompt, response_id: responseId });
+      console.log("Response:", response.data);
+
+      const userMessage: Message = {
+        role: "User",
+        message: continuedPrompt,
+      };
+
+      const systemMessage: Message = {
+        role: "System",
+        message: response.data.response,
+      }
+
+      setMessages((prevMessages) => [...prevMessages, userMessage, systemMessage]);
+      // setResponseId(response.data.response_id)
       setLoading(false)
     } catch (error) {
       console.error("Error posting item:", error);
@@ -148,7 +173,7 @@ function App() {
           {!loading && (
             <button
               type="button"
-              onClick={handleSubmit}
+              onClick={handleInitialChatSubmit}
               className="rounded-full bg-white px-2.5 py-1 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
             >
               Let's go!
@@ -176,12 +201,35 @@ function App() {
               />
             </svg>
           )}
-
-
         </div>
       )}
       {responseId && (
-        <ConversationFeed messages={messages} />
+        <>
+          <ConversationFeed messages={messages} />
+          <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[50%] flex gap-2">
+
+            <textarea
+              // type="text"
+              placeholder="Continue the conversation..."
+              onChange={continuedPromptChange}
+              className="w-1/2 rounded-md border border-gray-300 px-2 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <button
+              type="button"
+              onClick={handleContinuedChatSubmit}
+              className="w-1/4 rounded-md bg-indigo-600 px-2 py-1 text-sm text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            >
+              Submit
+            </button>
+            <button
+              type="button"
+              className="w-1/4 rounded-md bg-purple-600 px-2 py-1 text-sm text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            >
+              Start over?
+            </button>
+          </div>
+
+        </>
       )}
     </>
   )
