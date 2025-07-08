@@ -1,5 +1,6 @@
 import { Fragment } from 'react'
 import { ChatBubbleLeftEllipsisIcon, TagIcon, UserCircleIcon } from '@heroicons/react/20/solid'
+import ReactMarkdown from 'react-markdown'
 
 const activity = [
     {
@@ -64,8 +65,10 @@ export default function ConversationFeed({ messages }: Messages) {
                                             </div>
                                             <p className="mt-0.5 text-sm text-gray-500">Commented 6 days ago</p>
                                         </div>
-                                        <div className="mt-2 text-sm text-gray-700">
-                                            <p>{messageItem.message}</p>
+                                        <div className="mt-2 text-sm text-gray-700 whitespace-pre-line prose max-w-none">
+                                            <ReactMarkdown>
+                                                {messageItem.message}
+                                            </ReactMarkdown>
                                         </div>
                                     </div>
                                 </>

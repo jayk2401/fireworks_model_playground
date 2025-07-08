@@ -52,5 +52,8 @@ def chat_request(chatRequest: ChatRequest):
     
     initial_response_id = response.id
     formmated_response = response.output[-1].content[0].text.split("</think>")[-1]
+    
+    # Remove extra newline
+    formmated_response = formmated_response.replace("\n\n", "\n")
 
     return {"response": formmated_response, "response_id": initial_response_id}
