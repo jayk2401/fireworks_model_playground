@@ -29,7 +29,7 @@ function App() {
   const [responseId, setResponseId] = useState<string>('')
 
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [error, setError] = useState(false)
 
   useEffect(() => {
     axios.get('https://app.fireworks.ai/api/models/mini-playground')
@@ -53,6 +53,11 @@ function App() {
   }
 
   const handleInitialChatSubmit = async () => {
+    if (!prompt) {
+      setError(true)
+      return
+    }
+    setError(false)
     setLoading(true)
     try {
       const response = await axios.post("http://localhost:8000/chat_request", { model: selectedModel, prompt: prompt });
@@ -77,6 +82,10 @@ function App() {
   };
 
   const handleContinuedChatSubmit = async () => {
+    if (!continuedPrompt) {
+      setError(true)
+      return
+    }
     setLoading(true)
     try {
       const response = await axios.post("http://localhost:8000/chat_request_continued", { model: selectedModel, prompt: continuedPrompt, response_id: responseId });
@@ -177,13 +186,16 @@ function App() {
           </div>
 
           {!loading && (
-            <button
-              type="button"
-              onClick={handleInitialChatSubmit}
-              className="rounded-full bg-white px-2.5 py-1 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
-            >
-              Let's go!
-            </button>
+            <div className="space-x-4">
+              <button
+                type="button"
+                onClick={handleInitialChatSubmit}
+                className="rounded-full bg-white px-2.5 py-1 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
+              >
+                Let's go!
+              </button>
+              {error && <span className="text-sm text-red-600">Please enter a prompt.</span>}
+            </div>
           )}
           {loading && (
             <svg
@@ -214,6 +226,7 @@ function App() {
           <ConversationFeed messages={messages} />
           <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[40%] flex gap-2 justify-center">
             {!loading && (
+
               <>
                 <textarea
                   // type="text"
@@ -235,7 +248,9 @@ function App() {
                 >
                   Start over?
                 </button>
+
               </>
+
             )}
             {loading && (
 
