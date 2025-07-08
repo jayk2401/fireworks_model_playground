@@ -27,7 +27,7 @@ function App() {
 
   const [responseId, setResponseId] = useState<string>('')
 
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -42,7 +42,7 @@ function App() {
   }
 
   const handleSubmit = async () => {
-
+    setLoading(true)
     try {
       const response = await axios.post("http://localhost:8000/chat_request", { model: selectedModel, prompt: prompt });
       console.log("Response:", response.data);
@@ -63,6 +63,7 @@ function App() {
 
 
       setResponseId(response.data.response_id)
+      setLoading(false)
     } catch (error) {
       console.error("Error posting item:", error);
     }
@@ -144,14 +145,39 @@ function App() {
             </div>
           </div>
 
+          {!loading && (
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="rounded-full bg-white px-2.5 py-1 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
+            >
+              Let's go!
+            </button>
+          )}
+          {loading && (
+            <svg
+              className="h-8 w-8 animate-spin text-purple-700"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+              />
+            </svg>
+          )}
 
-          <button
-            type="button"
-            onClick={handleSubmit}
-            className="rounded-full bg-white px-2.5 py-1 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
-          >
-            Let's go!
-          </button>
+
         </div>
       )}
       {responseId && (

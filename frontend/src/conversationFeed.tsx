@@ -41,10 +41,11 @@ export default function ConversationFeed({ messages }: Messages) {
     console.log(messages)
     return (
         <div className="flow-root">
-            <ul role="list" className="-mb-8">
+            <ul role="list" className="-mb-8 border-1 border-purple-700 rounded-lg p-4">
                 {messages.map((messageItem) => (
                     <li key={messageItem.message}>
-                        <div className="relative pb-8">
+                        {/* <div className="relative p-4 border-b-1 border-purple-500 bg-gray-100"> */}
+                        <div className={`relative p-4  ${messageItem.role === 'System' ? 'bg-gray-100' : 'bg-white'}`}>
 
                             <div className="relative flex items-start space-x-3">
 
