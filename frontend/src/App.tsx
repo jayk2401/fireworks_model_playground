@@ -46,6 +46,12 @@ function App() {
     setContinuedPrompt(e.target.value)
   }
 
+  const handleReset = () => {
+    setResponseId('')
+    setMessages([])
+    setSelectedModel('qwen3-30b-a3b')
+  }
+
   const handleInitialChatSubmit = async () => {
     setLoading(true)
     try {
@@ -206,27 +212,55 @@ function App() {
       {responseId && (
         <>
           <ConversationFeed messages={messages} />
-          <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[50%] flex gap-2">
+          <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[40%] flex gap-2 justify-center">
+            {!loading && (
+              <>
+                <textarea
+                  // type="text"
+                  placeholder="Continue the conversation..."
+                  onChange={continuedPromptChange}
+                  className="w-1/2 rounded-md border border-gray-300 px-2 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <button
+                  type="button"
+                  onClick={handleContinuedChatSubmit}
+                  className="w-1/4 rounded-md bg-indigo-600 px-2 py-1 text-sm text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  Submit
+                </button>
+                <button
+                  type="button"
+                  onClick={handleReset}
+                  className="w-1/4 rounded-md bg-purple-600 px-2 py-1 text-sm text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  Start over?
+                </button>
+              </>
+            )}
+            {loading && (
 
-            <textarea
-              // type="text"
-              placeholder="Continue the conversation..."
-              onChange={continuedPromptChange}
-              className="w-1/2 rounded-md border border-gray-300 px-2 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            />
-            <button
-              type="button"
-              onClick={handleContinuedChatSubmit}
-              className="w-1/4 rounded-md bg-indigo-600 px-2 py-1 text-sm text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              Submit
-            </button>
-            <button
-              type="button"
-              className="w-1/4 rounded-md bg-purple-600 px-2 py-1 text-sm text-white hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            >
-              Start over?
-            </button>
+              <svg
+                className="h-8 w-8 animate-spin text-purple-700"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  className="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                />
+                <path
+                  className="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                />
+              </svg>
+
+            )}
           </div>
 
         </>

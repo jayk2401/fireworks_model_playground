@@ -1,3 +1,4 @@
+import { useRef, useEffect } from 'react';
 import { Fragment } from 'react'
 import { ChatBubbleLeftEllipsisIcon, TagIcon, UserCircleIcon } from '@heroicons/react/20/solid'
 import ReactMarkdown from 'react-markdown'
@@ -38,11 +39,22 @@ type Messages = {
 };
 
 export default function ConversationFeed({ messages }: Messages) {
+    const ulRef = useRef<HTMLUListElement>(null);
+    useEffect(() => {
+        if (ulRef.current) {
+            // Scroll to the bottom
+            ulRef.current.scrollTo({
+                top: ulRef.current.scrollHeight,
+                behavior: 'smooth',
+            });
+        }
+    }, [messages]); // run this effect every time items change
+
     console.log(messages)
     return (
 
         <div className="flow-root">
-            <ul role="list" className="-mb-8 border-1 border-purple-700 rounded-lg p-4 h-[85vh] overflow-y-auto">
+            <ul ref={ulRef} role="list" className="-mb-8 border-1 border-purple-700 rounded-lg p-4 h-[85vh] overflow-y-auto">
                 {messages.map((messageItem) => (
                     <li key={messageItem.message}>
                         {/* <div className="relative p-4 border-b-1 border-purple-500 bg-gray-100"> */}
