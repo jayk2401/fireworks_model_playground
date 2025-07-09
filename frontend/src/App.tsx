@@ -18,7 +18,6 @@ function App() {
     message: string;
   };
 
-  // const [count, setCount] = useState(0)
   const [models, setModels] = useState<Model[]>([]);
   const [selectedModel, setSelectedModel] = useState<string | null>('qwen3-30b-a3b')
   const [prompt, setPrompt] = useState<string>('')
@@ -86,22 +85,26 @@ function App() {
       setError(true)
       return
     }
+    const userMessage: Message = {
+      role: "User",
+      message: continuedPrompt,
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+
     setLoading(true)
     try {
       const response = await axios.post("http://localhost:8000/chat_request_continued", { model: selectedModel, prompt: continuedPrompt, response_id: responseId });
       console.log("Response:", response.data);
 
-      const userMessage: Message = {
-        role: "User",
-        message: continuedPrompt,
-      };
+
 
       const systemMessage: Message = {
         role: "System",
         message: response.data.response,
       }
 
-      setMessages((prevMessages) => [...prevMessages, userMessage, systemMessage]);
+      setMessages((prevMessages) => [...prevMessages, systemMessage]);
+
       // setResponseId(response.data.response_id)
       setLoading(false)
     } catch (error) {
