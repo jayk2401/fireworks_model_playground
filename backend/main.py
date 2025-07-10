@@ -39,16 +39,6 @@ def chat_request(chatRequest: ChatRequest):
         deployment_type="serverless"
     )
 
-    # response = llm.chat.completions.create(
-    #     messages=[{
-    #         "role": "system",
-    #         "content": chatRequest.prompt,
-    #     }],
-    # )
-
-    # formmated_response = response.choices[0].message.content.split("</think>")[1].strip()
-
-
     response = llm.responses.create(
         input=chatRequest.prompt,
         # tools=[{"type": "sse", "server_url": "https://gitmcp.io/docs"}]
@@ -56,11 +46,52 @@ def chat_request(chatRequest: ChatRequest):
     
     initial_response_id = response.id
     formmated_response = response.output[-1].content[0].text.split("</think>")[-1]
-    
     # Remove extra newline
     formmated_response = formmated_response.replace("\n\n", "\n")
 
     return {"response": formmated_response, "response_id": initial_response_id}
+
+
+@app.get("/chat_request1")
+def chat_request1(model: str, prompt: str):
+    def event_generator():
+        llm = LLM(
+            model=model,
+            deployment_type="serverless"
+        )
+
+        stream = llm.responses.create(
+            input=prompt,
+            stream=True,
+            # tools=[{"type": "sse", "server_url": "https://gitmcp.io/docs"}]
+        )
+        
+        # formmated_response = response.output[-1].content[0].text.split("</think>")[-1]
+        # Remove extra newline
+        # formmated_response = formmated_response.replace("\n\n", "\n")
+
+        completed_thinking_stage = False
+        try:
+            for chunk in stream:
+                print(chunk)
+                if chunk.type == "response.created":
+                    yield f"data: {json.dumps({'response_id': chunk.response.id})}\n\n"
+
+                if chunk.type == "response.output_text.delta":
+
+                    if completed_thinking_stage:
+                        yield f"data: {json.dumps({'delta': chunk.delta})}\n\n"
+
+                    if '</think>' in chunk.delta:
+                        completed_thinking_stage = True
+
+        except Exception as e:
+            print("Error in SSE stream:", e)
+            # traceback.print_exc()
+            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
+
 
 
 @app.post("/chat_request_continued")
