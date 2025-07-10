@@ -19,7 +19,8 @@ function App() {
     metadata?: string;
   };
 
-  const [models, setModels] = useState<Model[]>([]);
+  const [models, setModels] = useState<string[]>([]);
+
   const [selectedModel, setSelectedModel] = useState<string | null>('deepseek-r1-0528')
   const [prompt, setPrompt] = useState<string>('')
   const [continuedPrompt, setContinuedPrompt] = useState<string>('')
@@ -35,7 +36,15 @@ function App() {
 
   useEffect(() => {
     axios.get('https://app.fireworks.ai/api/models/mini-playground')
-      .then((res) => setModels(res.data))
+      .then((res) => {
+        let modelNames = []
+        for (let i = 0; i < res.data.length; i++) {
+          let modelName = res.data[i].name
+          modelName = modelName.split("/").pop()
+          modelNames.push(modelName)
+        }
+        setModels(modelNames)
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
   }, [])
@@ -260,8 +269,8 @@ function App() {
               >
 
                 {models.map(model => (
-                  <option key={model.name} value={model.name}>
-                    {model.title}
+                  <option key={model} value={model}>
+                    {model}
                   </option>
                 ))}
               </select>
