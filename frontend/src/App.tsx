@@ -16,6 +16,7 @@ function App() {
   type Message = {
     role: string;
     message: string;
+    metadata?: string;
   };
 
   const [models, setModels] = useState<Model[]>([]);
@@ -54,44 +55,21 @@ function App() {
     setSelectedModel('deepseek-r1-0528')
   }
 
-  const handleInitialChatSubmit = async () => {
-    console.log("handleInitialChatSubmit")
-    if (!prompt) {
-      setError(true)
-      return
-    }
-    setError(false)
-    setLoading(true)
+  const getCurrentTime = () => {
+    const now: Date = new Date();
 
-    const userMessage: Message = {
-      role: "User",
-      message: prompt,
+    const options: Intl.DateTimeFormatOptions = {
+      timeZone: 'America/Los_Angeles', // PST/PDT based on current date
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
     };
 
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
+    const time: string = now.toLocaleTimeString('en-US', options);
 
-    setChatBegun(true)
-    console.log("After adding user message")
-    console.log('message length:', messages.length)
-
-    try {
-      const response = await axios.post("http://localhost:8000/chat_request", { model: selectedModel, prompt: prompt });
-      console.log("Response:", response.data);
-
-
-      const systemMessage: Message = {
-        role: "System",
-        message: response.data.response,
-      }
-
-      setMessages((prevMessages) => [...prevMessages, systemMessage]);
-      setResponseId(response.data.response_id)
-      setLoading(false)
-    } catch (error) {
-      console.error("Error posting item:", error);
-    }
-  };
-
+    console.log(time); // e.g. "14:07"
+    return time
+  }
 
   const handleInitialChatSubmit1 = async () => {
     console.log("handleInitialChatSubmit1")
@@ -102,9 +80,12 @@ function App() {
     setError(false)
     setLoading(true)
 
+    let currentTimeUser = getCurrentTime()
+
     const userMessage: Message = {
       role: "User",
       message: prompt,
+      metadata: currentTimeUser
     };
 
     setMessages((prevMessages) => [...prevMessages, userMessage]);
@@ -128,12 +109,13 @@ function App() {
 
         const delta = data.delta;
         chunkText += delta
-        // setMessages((prev) => [...prev, event.data]);
 
         if (!begunAdding) {
+          let currentTimeSystem = getCurrentTime()
           const systemMessage: Message = {
             role: "System",
             message: chunkText,
+            metadata: currentTimeSystem
           }
           setMessages((prevMessages) => [...prevMessages, systemMessage]);
           begunAdding = true
@@ -173,46 +155,18 @@ function App() {
 
   };
 
-  const handleContinuedChatSubmit = async () => {
-    if (!continuedPrompt) {
-      setError(true)
-      return
-    }
-    const userMessage: Message = {
-      role: "User",
-      message: continuedPrompt,
-    };
-    setMessages((prevMessages) => [...prevMessages, userMessage]);
-
-    setLoading(true)
-
-    try {
-      const response = await axios.post("http://localhost:8000/chat_request_continued", { model: selectedModel, prompt: continuedPrompt, response_id: responseId });
-      console.log("Response:", response.data);
-
-      const systemMessage: Message = {
-        role: "System",
-        message: response.data.response,
-      }
-
-      setMessages((prevMessages) => [...prevMessages, systemMessage]);
-      setLoading(false)
-
-    } catch (error) {
-      console.error("Error posting item:", error);
-    }
-  };
-
-
 
   const handleContinuedChatSubmit1 = async () => {
     if (!continuedPrompt) {
       setError(true)
       return
     }
+    let currentTime = getCurrentTime()
+
     const userMessage: Message = {
       role: "User",
       message: continuedPrompt,
+      metadata: currentTime
     };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
@@ -236,6 +190,7 @@ function App() {
         const systemMessage: Message = {
           role: "System",
           message: chunkText,
+          metadata: currentTime
         }
         setMessages((prevMessages) => [...prevMessages, systemMessage]);
         begunAdding = true
