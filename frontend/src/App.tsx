@@ -92,6 +92,87 @@ function App() {
     }
   };
 
+
+  const handleInitialChatSubmit1 = async () => {
+    console.log("handleInitialChatSubmit1")
+    if (!prompt) {
+      setError(true)
+      return
+    }
+    setError(false)
+    setLoading(true)
+
+    const userMessage: Message = {
+      role: "User",
+      message: prompt,
+    };
+
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+
+    setChatBegun(true)
+
+
+    const eventSource = new EventSource(`http://localhost:8000/chat_request1?model=${selectedModel}&prompt=${prompt}`);
+
+    let chunkText: string = ''
+    let begunAdding = false
+
+    eventSource.onmessage = (event) => {
+
+      const data = JSON.parse(event.data);
+      if ('response_id' in data) {
+        setResponseId(data.response_id)
+      }
+      if ('delta' in data) {
+        setLoading(false)
+
+        const delta = data.delta;
+        chunkText += delta
+        // setMessages((prev) => [...prev, event.data]);
+
+        if (!begunAdding) {
+          const systemMessage: Message = {
+            role: "System",
+            message: chunkText,
+          }
+          setMessages((prevMessages) => [...prevMessages, systemMessage]);
+          begunAdding = true
+        } else {
+          // Update last message in array (the one we just added)
+          setMessages((prevMessages) => {
+            const updatedMessages = [...prevMessages];
+            const lastIndex = updatedMessages.length - 1;
+
+            if (updatedMessages[lastIndex]?.role === "System") {
+              updatedMessages[lastIndex] = {
+                ...updatedMessages[lastIndex],
+                message: chunkText,
+              };
+            }
+
+            return updatedMessages;
+          });
+        }
+      }
+    }
+
+    eventSource.onerror = (err) => {
+      console.error("EventSource failed:", err);
+      console.log(chunkText)
+      eventSource.close();
+    };
+
+    return () => {
+      console.log("** FNISHED")
+      setLoading(false)
+      // console.log(chunkArr)
+      eventSource.close();
+    };
+
+
+
+  };
+
   const handleContinuedChatSubmit = async () => {
     if (!continuedPrompt) {
       setError(true)
@@ -140,7 +221,6 @@ function App() {
     const eventSource = new EventSource(`http://localhost:8000/chat_request_continued1?model=${selectedModel}&prompt=${continuedPrompt}&response_id=${responseId}`);
 
     let chunkText: string = ''
-
     let begunAdding = false
 
     eventSource.onmessage = (event) => {
@@ -175,9 +255,7 @@ function App() {
           return updatedMessages;
         });
       }
-
-
-    };
+    }
 
     eventSource.onerror = (err) => {
       console.error("EventSource failed:", err);
@@ -260,7 +338,7 @@ function App() {
           <div className="space-x-4">
             <button
               type="button"
-              onClick={handleInitialChatSubmit}
+              onClick={handleInitialChatSubmit1}
               className="rounded-full bg-white px-2.5 py-1 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
             >
               Let's go!
