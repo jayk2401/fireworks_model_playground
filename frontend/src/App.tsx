@@ -1,17 +1,10 @@
 import { useState, useEffect } from 'react'
-// import reactLogo from './assets/react.svg'
-// import viteLogo from '/vite.svg'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import axios from 'axios'
 import ConversationFeed from './conversationFeed'
 import './App.css'
 
 function App() {
-
-  type Model = {
-    name: string;
-    title: string;
-  };
 
   type Message = {
     role: string;
@@ -21,7 +14,7 @@ function App() {
 
   const [models, setModels] = useState<string[]>([]);
 
-  const [selectedModel, setSelectedModel] = useState<string | null>('deepseek-r1-0528')
+  const [selectedModel, setSelectedModel] = useState<string | null>('qwen3-30b-a3b')
   const [prompt, setPrompt] = useState<string>('')
   const [continuedPrompt, setContinuedPrompt] = useState<string>('')
 
@@ -61,7 +54,7 @@ function App() {
     setResponseId('')
     setMessages([])
     setChatBegun(false)
-    setSelectedModel('deepseek-r1-0528')
+    setSelectedModel('qwen3-30b-a3b')
   }
 
   const getCurrentTime = () => {
@@ -159,8 +152,6 @@ function App() {
       // console.log(chunkArr)
       eventSource.close();
     };
-
-
 
   };
 
