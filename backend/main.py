@@ -105,12 +105,10 @@ def chat_request_continued1(model: str, prompt: str, response_id: str):
         try:
             for chunk in stream:
                 if chunk.type == "response.output_text.delta":
-
                     if completed_thinking_stage:
                         yield f"data: {json.dumps({'delta': chunk.delta})}\n\n"
 
-                    if chunk.delta == '</think>':
-                        print('chunk delta is </think>')
+                    if '</think>' in chunk.delta:
                         completed_thinking_stage = True
 
         except Exception as e:
