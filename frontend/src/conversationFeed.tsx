@@ -40,13 +40,14 @@ type Messages = {
 
 export default function ConversationFeed({ messages }: Messages) {
 
-    const lastMessageRef = useRef<HTMLLIElement>(null);
+    const ulRef = useRef<HTMLUListElement>(null);
 
     useEffect(() => {
-        if (lastMessageRef.current) {
-            lastMessageRef.current.scrollIntoView({
+        if (ulRef.current) {
+            // Scroll to the bottom
+            ulRef.current.scrollTo({
+                top: ulRef.current.scrollHeight,
                 behavior: 'smooth',
-                block: 'start', // aligns to top
             });
         }
     }, [messages]); // run this effect every time items change
@@ -55,10 +56,9 @@ export default function ConversationFeed({ messages }: Messages) {
     return (
 
         <div className="flow-root">
-            <ul role="list" className="-mb-8 border-1 border-purple-700 rounded-lg p-4 h-[80vh] overflow-y-auto">
-                {messages.map((messageItem, index) => (
+            <ul ref={ulRef} role="list" className="-mb-8 border-1 border-purple-700 rounded-lg p-4 h-[80vh] overflow-y-auto">
+                {messages.map((messageItem) => (
                     <li key={messageItem.message}
-                        ref={index === messages.length - 1 ? lastMessageRef : null}
                     >
                         {/* <div className="relative p-4 border-b-1 border-purple-500 bg-gray-100"> */}
                         <div className={`relative p-4  ${messageItem.role === 'System' ? 'bg-gray-100' : 'bg-white'}`}>

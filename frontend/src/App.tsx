@@ -30,6 +30,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
 
+
   useEffect(() => {
     axios.get('https://app.fireworks.ai/api/models/mini-playground')
       .then((res) => setModels(res.data))
@@ -92,11 +93,10 @@ function App() {
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
     setLoading(true)
+
     try {
       const response = await axios.post("http://localhost:8000/chat_request_continued", { model: selectedModel, prompt: continuedPrompt, response_id: responseId });
       console.log("Response:", response.data);
-
-
 
       const systemMessage: Message = {
         role: "System",
@@ -104,12 +104,82 @@ function App() {
       }
 
       setMessages((prevMessages) => [...prevMessages, systemMessage]);
-
-      // setResponseId(response.data.response_id)
       setLoading(false)
+
     } catch (error) {
       console.error("Error posting item:", error);
     }
+  };
+
+
+
+  const handleContinuedChatSubmit1 = async () => {
+    if (!continuedPrompt) {
+      setError(true)
+      return
+    }
+    const userMessage: Message = {
+      role: "User",
+      message: continuedPrompt,
+    };
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+
+    setLoading(true)
+
+    const eventSource = new EventSource(`http://localhost:8000/chat_request_continued1?model=${selectedModel}&prompt=${continuedPrompt}&response_id=${responseId}`);
+
+    let chunkText: string = ''
+
+    let begunAdding = false
+
+    eventSource.onmessage = (event) => {
+      setLoading(false)
+
+      const data = JSON.parse(event.data);
+      const delta = data.delta;
+      chunkText += delta
+      // setMessages((prev) => [...prev, event.data]);
+
+      if (!begunAdding) {
+        const systemMessage: Message = {
+          role: "System",
+          message: chunkText,
+        }
+        setMessages((prevMessages) => [...prevMessages, systemMessage]);
+        begunAdding = true
+      } else {
+        // Update last message in array (the one we just added)
+        setMessages((prevMessages) => {
+          const updatedMessages = [...prevMessages];
+          const lastIndex = updatedMessages.length - 1;
+
+          if (updatedMessages[lastIndex]?.role === "System") {
+            updatedMessages[lastIndex] = {
+              ...updatedMessages[lastIndex],
+              message: chunkText,
+            };
+          }
+
+          return updatedMessages;
+        });
+      }
+
+
+    };
+
+    eventSource.onerror = (err) => {
+      console.error("EventSource failed:", err);
+      console.log(chunkText)
+      eventSource.close();
+    };
+
+    return () => {
+      console.log("** FNISHED")
+      setLoading(false)
+      // console.log(chunkArr)
+      eventSource.close();
+    };
+
   };
 
   const modelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -151,7 +221,6 @@ function App() {
               <select
                 id="model"
                 name="model"
-                // defaultValue="Canada"
                 value={selectedModel ?? ''}
                 // onChange={(e) => setSelectedModel(String(e.target.value))}
                 onChange={modelChange}
@@ -239,7 +308,7 @@ function App() {
                 />
                 <button
                   type="button"
-                  onClick={handleContinuedChatSubmit}
+                  onClick={handleContinuedChatSubmit1}
                   className="w-1/4 rounded-md bg-indigo-600 px-2 py-1 text-sm text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 >
                   Submit
