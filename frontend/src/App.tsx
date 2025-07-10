@@ -19,7 +19,7 @@ function App() {
   };
 
   const [models, setModels] = useState<Model[]>([]);
-  const [selectedModel, setSelectedModel] = useState<string | null>('qwen3-30b-a3b')
+  const [selectedModel, setSelectedModel] = useState<string | null>('deepseek-r1-0528')
   const [prompt, setPrompt] = useState<string>('')
   const [continuedPrompt, setContinuedPrompt] = useState<string>('')
 
@@ -30,6 +30,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
 
+  const [chatBegun, setChatBegun] = useState(false)
 
   useEffect(() => {
     axios.get('https://app.fireworks.ai/api/models/mini-playground')
@@ -49,31 +50,41 @@ function App() {
   const handleReset = () => {
     setResponseId('')
     setMessages([])
-    setSelectedModel('qwen3-30b-a3b')
+    setChatBegun(false)
+    setSelectedModel('deepseek-r1-0528')
   }
 
   const handleInitialChatSubmit = async () => {
+    console.log("handleInitialChatSubmit")
     if (!prompt) {
       setError(true)
       return
     }
     setError(false)
     setLoading(true)
+
+    const userMessage: Message = {
+      role: "User",
+      message: prompt,
+    };
+
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
+
+    setChatBegun(true)
+    console.log("After adding user message")
+    console.log('message length:', messages.length)
+
     try {
       const response = await axios.post("http://localhost:8000/chat_request", { model: selectedModel, prompt: prompt });
       console.log("Response:", response.data);
 
-      const userMessage: Message = {
-        role: "User",
-        message: prompt,
-      };
 
       const systemMessage: Message = {
         role: "System",
         message: response.data.response,
       }
 
-      setMessages((prevMessages) => [...prevMessages, userMessage, systemMessage]);
+      setMessages((prevMessages) => [...prevMessages, systemMessage]);
       setResponseId(response.data.response_id)
       setLoading(false)
     } catch (error) {
@@ -137,6 +148,7 @@ function App() {
 
       const data = JSON.parse(event.data);
       const delta = data.delta;
+      console.log(delta)
       chunkText += delta
       // setMessages((prev) => [...prev, event.data]);
 
@@ -194,24 +206,11 @@ function App() {
         <a href="https://fireworks.ai/" target="_blank">
           <img src={'https://cdn.sanity.io/images/pv37i0yn/production/df64b2d19687cef1b12f8c0bca7d979faf9fe7c0-215x24.svg'} className="logo" alt="Fireworks logo" />
         </a>
-        {/* <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a> */}
-      </div>
-      {/* <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p> */}
 
-      {!responseId && (
+      </div>
+
+
+      {!chatBegun && (
         <div className="mx-auto  max-w-sm items-center gap-x-4 space-y-4 rounded-xl bg-white p-6 shadow-lg">
           <div>
             <label htmlFor="location" className="block text-sm/6 font-medium text-gray-900">
@@ -257,43 +256,21 @@ function App() {
             </div>
           </div>
 
-          {!loading && (
-            <div className="space-x-4">
-              <button
-                type="button"
-                onClick={handleInitialChatSubmit}
-                className="rounded-full bg-white px-2.5 py-1 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
-              >
-                Let's go!
-              </button>
-              {error && <span className="text-sm text-red-600">Please enter a prompt.</span>}
-            </div>
-          )}
-          {loading && (
-            <svg
-              className="h-8 w-8 animate-spin text-purple-700"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
+
+          <div className="space-x-4">
+            <button
+              type="button"
+              onClick={handleInitialChatSubmit}
+              className="rounded-full bg-white px-2.5 py-1 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50"
             >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-              />
-            </svg>
-          )}
+              Let's go!
+            </button>
+            {error && <span className="text-sm text-red-600">Please enter a prompt.</span>}
+          </div>
+
         </div>
       )}
-      {responseId && (
+      {chatBegun && (
         <>
           <ConversationFeed messages={messages} />
           <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-[40%] flex gap-2 justify-center">
