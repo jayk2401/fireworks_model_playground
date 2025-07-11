@@ -18,7 +18,8 @@ function App() {
   const [prompt, setPrompt] = useState<string>('')
   const [continuedPrompt, setContinuedPrompt] = useState<string>('')
 
-  const [messages, setMessages] = useState<{ role: string; message: string }[]>([])
+  // const [messages, setMessages] = useState<{ role: string; message: string }[]>([])
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const [responseId, setResponseId] = useState<string>('')
 
@@ -75,7 +76,7 @@ function App() {
   }
 
   const handleInitialChatSubmit1 = async () => {
-    console.log("handleInitialChatSubmit1")
+
     if (!prompt) {
       setError(true)
       return
@@ -102,6 +103,7 @@ function App() {
     let begunAdding = false
 
     const startTime = new Date()
+    let totalTokens = 0
 
     eventSource.onmessage = (event) => {
 
@@ -114,6 +116,7 @@ function App() {
 
         const delta = data.delta;
         chunkText += delta
+        totalTokens += 1
 
         if (!begunAdding) {
           let currentTimeSystem = getCurrentTime()
@@ -150,6 +153,27 @@ function App() {
       console.error("EventSource failed:", err);
       console.log(chunkText)
       eventSource.close();
+
+      const finalEndTime = new Date()
+      const totalSecondsResponse = Math.round((finalEndTime.getTime() - startTime.getTime()) / 1000)
+
+      const tokensPerSecond = Math.round(totalTokens / totalSecondsResponse)
+
+      setMessages((prevMessages) => {
+        const updatedMessages = [...prevMessages];
+        const lastIndex = updatedMessages.length - 1;
+
+        if (updatedMessages[lastIndex]?.role === "System") {
+          updatedMessages[lastIndex] = {
+            ...updatedMessages[lastIndex],
+            metadata: `${updatedMessages[lastIndex].metadata ?? ''} - ${totalSecondsResponse} total response time - ${tokensPerSecond} tokens per second`
+          };
+        }
+
+        return updatedMessages;
+      });
+
+
     };
 
     return () => {
@@ -184,6 +208,7 @@ function App() {
     let begunAdding = false
 
     const startTime = new Date()
+    let totalTokens = 0
 
     eventSource.onmessage = (event) => {
       setLoading(false)
@@ -192,6 +217,7 @@ function App() {
       const delta = data.delta;
       console.log(delta)
       chunkText += delta
+      totalTokens += 1
       // setMessages((prev) => [...prev, event.data]);
 
       if (!begunAdding) {
@@ -229,6 +255,28 @@ function App() {
       console.error("EventSource failed:", err);
       console.log(chunkText)
       eventSource.close();
+
+      const finalEndTime = new Date()
+      const totalSecondsResponse = Math.round((finalEndTime.getTime() - startTime.getTime()) / 1000)
+
+      const tokensPerSecond = Math.round(totalTokens / totalSecondsResponse)
+
+      setMessages((prevMessages) => {
+        const updatedMessages = [...prevMessages];
+        const lastIndex = updatedMessages.length - 1;
+
+        if (updatedMessages[lastIndex]?.role === "System") {
+          updatedMessages[lastIndex] = {
+            ...updatedMessages[lastIndex],
+            metadata: `${updatedMessages[lastIndex].metadata ?? ''} - ${totalSecondsResponse} total response time - ${tokensPerSecond} tokens per second`
+          };
+        }
+
+        return updatedMessages;
+      });
+
+
+
     };
 
     return () => {
