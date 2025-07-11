@@ -55,6 +55,7 @@ function App() {
     setMessages([])
     setChatBegun(false)
     setSelectedModel('qwen3-30b-a3b')
+    setPrompt('')
   }
 
   const getCurrentTime = () => {
