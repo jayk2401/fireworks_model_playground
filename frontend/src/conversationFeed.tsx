@@ -1,6 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { Fragment } from 'react'
-import { ChatBubbleLeftEllipsisIcon, TagIcon, UserCircleIcon, UserPlusIcon } from '@heroicons/react/20/solid'
+import { UserCircleIcon, UserPlusIcon } from '@heroicons/react/20/solid'
 import ReactMarkdown from 'react-markdown'
 
 

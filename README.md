@@ -5,7 +5,9 @@
 Create virtual env, I use conda
 
 `conda create -n fireworks_env python=3.11`
+
 `conda activate fireworks_env`
+
 `pip install -r requirements.txt`
 
 Set API KEY in environment:
@@ -18,7 +20,9 @@ In different terminal:
 
 Start react frontend server
 `cd frontend`
+
 `npm install`
+
 `npm run dev`
 
 
