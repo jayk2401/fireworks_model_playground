@@ -297,9 +297,11 @@ function App() {
   return (
     <>
       <div className="flex justify-center m-6">
-        <a href="https://fireworks.ai/" target="_blank">
+
+        <button className="cursor-pointer" onClick={handleReset}>
           <img src={'https://cdn.sanity.io/images/pv37i0yn/production/df64b2d19687cef1b12f8c0bca7d979faf9fe7c0-215x24.svg'} className="logo" alt="Fireworks logo" />
-        </a>
+        </button>
+
 
       </div>
 
