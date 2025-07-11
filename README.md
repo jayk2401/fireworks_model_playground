@@ -1,25 +1,24 @@
-git clone https://github.com/jayk2401/fireworks_model_playground.git
+`git clone https://github.com/jayk2401/fireworks_model_playground.git`
 
-cd backend
+`cd backend`
 
-# create virtual env, I use conda
+Create virtual env, I use conda
 
-conda create -n fireworks_env python=3.11
-conda activate fireworks_env
-pip install -r requirements.txt
+`conda create -n fireworks_env python=3.11`
+`conda activate fireworks_env`
+`pip install -r requirements.txt`
 
 Set API KEY in environment:
-export FIREWORKS_API_KEY='<API_KEY>'
+`export FIREWORKS_API_KEY='<API_KEY>'`
 
-# start backend server
-uvicorn main:app --reload 
-
+Start backend server
+`uvicorn main:app --reload`
 
 In different terminal:
 # start react frontend server
-cd frontend
-npm install
-npm run dev
+`cd frontend`
+`npm install`
+`npm run dev`
 
 
 Potential Improvements:
