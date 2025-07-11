@@ -4,6 +4,11 @@ import axios from 'axios'
 import ConversationFeed from './conversationFeed'
 import './App.css'
 
+
+// This should be handled in .env files
+// const API_BACKEND_URL = 'https://fastapi-backend-1089230392400.us-central1.run.app'
+const API_BACKEND_URL = 'http://localhost:8000'
+
 function App() {
 
   type Message = {
@@ -97,7 +102,7 @@ function App() {
     setChatBegun(true)
 
 
-    const eventSource = new EventSource(`http://localhost:8000/chat_request1?model=${selectedModel}&prompt=${prompt}`);
+    const eventSource = new EventSource(`${API_BACKEND_URL}/chat_request1?model=${selectedModel}&prompt=${prompt}`);
 
     let chunkText: string = ''
     let begunAdding = false
@@ -202,7 +207,7 @@ function App() {
 
     setLoading(true)
 
-    const eventSource = new EventSource(`http://localhost:8000/chat_request_continued1?model=${selectedModel}&prompt=${continuedPrompt}&response_id=${responseId}`);
+    const eventSource = new EventSource(`${API_BACKEND_URL}/chat_request_continued1?model=${selectedModel}&prompt=${continuedPrompt}&response_id=${responseId}`);
 
     let chunkText: string = ''
     let begunAdding = false
@@ -375,6 +380,7 @@ function App() {
               <>
                 <textarea
                   // type="text"
+                  required
                   placeholder="Continue the conversation..."
                   onChange={continuedPromptChange}
                   className="w-1/2 rounded-md border border-gray-300 px-2 py-1 text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
