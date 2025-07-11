@@ -100,6 +100,8 @@ function App() {
     let chunkText: string = ''
     let begunAdding = false
 
+    const startTime = new Date()
+
     eventSource.onmessage = (event) => {
 
       const data = JSON.parse(event.data);
@@ -114,10 +116,13 @@ function App() {
 
         if (!begunAdding) {
           let currentTimeSystem = getCurrentTime()
+          const firstTokenTime = new Date()
+          const diffInSecondsFirstToken = Math.round((firstTokenTime.getTime() - startTime.getTime()) / 1000)
+
           const systemMessage: Message = {
             role: "System",
             message: chunkText,
-            metadata: currentTimeSystem
+            metadata: `${currentTimeSystem} - ${diffInSecondsFirstToken} seconds to first token`
           }
           setMessages((prevMessages) => [...prevMessages, systemMessage]);
           begunAdding = true
@@ -177,6 +182,8 @@ function App() {
     let chunkText: string = ''
     let begunAdding = false
 
+    const startTime = new Date()
+
     eventSource.onmessage = (event) => {
       setLoading(false)
 
@@ -187,10 +194,15 @@ function App() {
       // setMessages((prev) => [...prev, event.data]);
 
       if (!begunAdding) {
+
+        const firstTokenTime = new Date()
+        const diffInSecondsFirstToken = Math.round((firstTokenTime.getTime() - startTime.getTime()) / 1000)
+        let currentTimeSystem = getCurrentTime()
+
         const systemMessage: Message = {
           role: "System",
           message: chunkText,
-          metadata: currentTime
+          metadata: `${currentTimeSystem} - ${diffInSecondsFirstToken} seconds to first token`
         }
         setMessages((prevMessages) => [...prevMessages, systemMessage]);
         begunAdding = true
