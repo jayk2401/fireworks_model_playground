@@ -126,7 +126,7 @@ function App() {
           const systemMessage: Message = {
             role: "System",
             message: chunkText,
-            metadata: `${currentTimeSystem} - ${diffInSecondsFirstToken} seconds to first token`
+            metadata: `${currentTimeSystem} - ${diffInSecondsFirstToken}s to first token`
           }
           setMessages((prevMessages) => [...prevMessages, systemMessage]);
           begunAdding = true
@@ -166,7 +166,7 @@ function App() {
         if (updatedMessages[lastIndex]?.role === "System") {
           updatedMessages[lastIndex] = {
             ...updatedMessages[lastIndex],
-            metadata: `${updatedMessages[lastIndex].metadata ?? ''} - ${totalSecondsResponse} total response time - ${tokensPerSecond} tokens per second`
+            metadata: `${updatedMessages[lastIndex].metadata ?? ''} - ${totalSecondsResponse}s total response time - ${tokensPerSecond} tokens per second - ${totalTokens} total tokens`
           };
         }
 
@@ -215,10 +215,10 @@ function App() {
 
       const data = JSON.parse(event.data);
       const delta = data.delta;
-      console.log(delta)
+
       chunkText += delta
       totalTokens += 1
-      // setMessages((prev) => [...prev, event.data]);
+
 
       if (!begunAdding) {
 
@@ -229,7 +229,7 @@ function App() {
         const systemMessage: Message = {
           role: "System",
           message: chunkText,
-          metadata: `${currentTimeSystem} - ${diffInSecondsFirstToken} seconds to first token`
+          metadata: `${currentTimeSystem} - ${diffInSecondsFirstToken}s to first token`
         }
         setMessages((prevMessages) => [...prevMessages, systemMessage]);
         begunAdding = true
@@ -268,7 +268,7 @@ function App() {
         if (updatedMessages[lastIndex]?.role === "System") {
           updatedMessages[lastIndex] = {
             ...updatedMessages[lastIndex],
-            metadata: `${updatedMessages[lastIndex].metadata ?? ''} - ${totalSecondsResponse} total response time - ${tokensPerSecond} tokens per second`
+            metadata: `${updatedMessages[lastIndex].metadata ?? ''} - ${totalSecondsResponse}s total response time - ${tokensPerSecond} tokens per second - ${totalTokens} total tokens`
           };
         }
 
