@@ -12,6 +12,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:5173",  # or wherever your frontend runs
+    "https://react-frontend-1089230392400.us-central1.run.app"
 ]
 app.add_middleware(
     CORSMiddleware,
