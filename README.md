@@ -1,3 +1,5 @@
+Visit public version here: https://react-frontend-1089230392400.us-central1.run.app/
+
 `git clone https://github.com/jayk2401/fireworks_model_playground.git`
 
 `cd backend`
