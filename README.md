@@ -15,7 +15,8 @@ Start backend server
 `uvicorn main:app --reload`
 
 In different terminal:
-# start react frontend server
+
+Start react frontend server
 `cd frontend`
 `npm install`
 `npm run dev`
